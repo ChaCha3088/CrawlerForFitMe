@@ -39,6 +39,9 @@ dependencies {
 	// jsoup
 	implementation 'org.jsoup:jsoup:1.16.1'
 
+	// JavaYoutubeDownloader
+	implementation 'io.github.gaeqs:JavaYoutubeDownloader:1.2.3'
+
     // MySql
     implementation 'mysql:mysql-connector-java:8.0.33'
 
