@@ -29,6 +29,10 @@ public class Song {
     @NotBlank
     private String artist;
 
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(name = "YOUTUBE_ID")
+    private Youtube youtube;
+
     @NotNull
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "CATEGORY_ID")
