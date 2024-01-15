@@ -1,0 +1,34 @@
+# local
+spring:
+    config:
+        import: 'aws-parameterstore:'
+        activate:
+            on-profile: local
+    datasource:
+        url: jdbc:mysql://${MY_SQL.HOST}:${MY_SQL.PORT}/${MY_SQL.DATABASE}?useSSL=false&serverTimezone=Asia/Seoul
+        username: ${DB.USERNAME}
+        password: ${DB.PASSWORD}
+        driver-class-name: com.mysql.cj.jdbc.Driver
+    jpa:
+        hibernate:
+            ddl-auto: ${JPA.DDL_AUTO}
+            logging:
+                level:
+                    org:
+                        hibernate.SQL: debug
+        properties:
+            hibernate:
+                show_sql: true
+                format_sql: true
+                dialect: org.hibernate.dialect.MySQLDialect
+
+    batch:
+        job:
+            name: ${job.name:NONE}
+        jdbc:
+            initialize-schema: always
+            schema: classpath:org/springframework/batch/core/schema-mysql.sql
+
+logging:
+    level:
+        root: info

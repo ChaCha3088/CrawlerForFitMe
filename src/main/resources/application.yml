@@ -1,0 +1,13 @@
+spring:
+    jpa:
+        properties:
+            hibernate:
+                default_batch_fetch_size: 100
+
+# aws parameter store
+aws:
+    paramstore:
+        enabled: true
+        prefix: /Diva
+        name: BATCH
+        profileSeparator: _
