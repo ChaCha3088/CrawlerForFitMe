@@ -1,5 +1,6 @@
 package com.diva.batch.entity;
 
+import com.diva.batch.enumstorage.Note;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -29,9 +30,19 @@ public class Song {
     @NotBlank
     private String artist;
 
-    @OneToOne(fetch = LAZY)
-    @JoinColumn(name = "YOUTUBE_ID")
-    private Youtube youtube;
+    private String albumUrl;
+
+    @Enumerated(EnumType.STRING)
+    private Note highestNote;
+
+    @Enumerated(EnumType.STRING)
+    private Note lowestNote;
+
+    private String mrUrl;
+
+    @OneToOne(fetch = LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JoinColumn(name = "YOUTUBE_FILE_ID")
+    private YoutubeFile youtubeFile;
 
     @NotNull
     @ManyToOne(fetch = LAZY)
@@ -53,5 +64,9 @@ public class Song {
         this.category = category;
 
         this.category.addSong(this);
+    }
+
+    public void addYoutubeFile(YoutubeFile youtubeFile) {
+        this.youtubeFile = youtubeFile;
     }
 }

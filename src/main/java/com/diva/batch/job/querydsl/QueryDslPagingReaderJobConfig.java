@@ -1,5 +1,6 @@
 //package com.diva.batch.job.querydsl;
 //
+//import com.diva.batch.entity.Song;
 //import lombok.RequiredArgsConstructor;
 //import lombok.extern.slf4j.Slf4j;
 //import org.springframework.batch.core.Job;
@@ -30,7 +31,7 @@
 //    @JobScope
 //    public Step queryDslPagingReaderJob_step1() {
 //        return new StepBuilder("queryDslPagingReaderJob_step1", jobRepository)
-//            .<Article, Article>chunk(60, transactionManager)
+//            .<Song, Article>chunk(10, transactionManager)
 //            .reader(queryDslPagingReaderJob_reader())
 //            .processor(queryDslPagingReaderJob_processor())
 //            .writer(queryDslPagingReaderJob_writer())
@@ -38,10 +39,8 @@
 //    }
 //
 //    @Bean
-//    public QuerydslPagingItemReader<Article> queryDslPagingReaderJob_reader() {
+//    public QuerydslPagingItemReader<Song> queryDslPagingReaderJob_reader() {
 //        return new QuerydslPagingItemReader<>(transactionManager, 60, queryFactory -> queryFactory
-//            .selectFrom(QArticle.article)
-//            .where(QArticle.article.b
-//            .orderBy(QArticle.article.id.asc())
+//
 //        );
 //}

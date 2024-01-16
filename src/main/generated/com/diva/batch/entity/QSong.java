@@ -22,15 +22,25 @@ public class QSong extends EntityPathBase<Song> {
 
     public static final QSong song = new QSong("song");
 
+    public final StringPath albumUrl = createString("albumUrl");
+
     public final StringPath artist = createString("artist");
 
     public final QCategory category;
 
+    public final EnumPath<com.diva.batch.enumstorage.Note> highestNote = createEnum("highestNote", com.diva.batch.enumstorage.Note.class);
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    public final EnumPath<com.diva.batch.enumstorage.Note> lowestNote = createEnum("lowestNote", com.diva.batch.enumstorage.Note.class);
+
+    public final StringPath mrUrl = createString("mrUrl");
 
     public final StringPath title = createString("title");
 
     public final NumberPath<Long> tjId = createNumber("tjId", Long.class);
+
+    public final QYoutubeFile youtubeFile;
 
     public QSong(String variable) {
         this(Song.class, forVariable(variable), INITS);
@@ -51,6 +61,7 @@ public class QSong extends EntityPathBase<Song> {
     public QSong(Class<? extends Song> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.category = inits.isInitialized("category") ? new QCategory(forProperty("category")) : null;
+        this.youtubeFile = inits.isInitialized("youtubeFile") ? new QYoutubeFile(forProperty("youtubeFile"), inits.get("youtubeFile")) : null;
     }
 
 }

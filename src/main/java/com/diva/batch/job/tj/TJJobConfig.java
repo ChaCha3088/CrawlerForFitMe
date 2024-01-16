@@ -4,6 +4,7 @@ import com.diva.batch.entity.Category;
 import com.diva.batch.entity.Song;
 import com.diva.batch.repository.CategoryRepository;
 import com.diva.batch.repository.SongRepository;
+import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Connection;

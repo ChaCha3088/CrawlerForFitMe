@@ -1,32 +1,32 @@
-package com.diva.batch.job.querydsl;
+package com.diva.batch.querydsl.itemreader;
 
+import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
+import org.springframework.batch.item.database.AbstractPagingItemReader;
+import org.springframework.batch.item.database.orm.JpaQueryProvider;
+import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.util.ClassUtils;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
-import org.springframework.batch.item.database.AbstractPagingItemReader;
-import org.springframework.batch.item.database.orm.JpaQueryProvider;
-import org.springframework.dao.DataAccessResourceFailureException;
-import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.StringUtils;
 
 public class QuerydslPagingItemReader<T> extends AbstractPagingItemReader<T> {
-    private EntityManagerFactory entityManagerFactory;
-    private EntityManager entityManager;
-    private final Map<String, Object> jpaPropertyMap = new HashMap();
+    protected EntityManagerFactory entityManagerFactory;
+    protected EntityManager entityManager;
+    protected final Map<String, Object> jpaPropertyMap = new HashMap();
     private String queryString;
     private JpaQueryProvider queryProvider;
     private Map<String, Object> parameterValues;
-    private boolean transacted = true;
-    private Function<JPAQueryFactory, JPAQuery<T>> queryFunction;
+    protected Function<JPAQueryFactory, JPAQuery<T>> queryFunction;
+    protected boolean transacted = true;
 
     protected QuerydslPagingItemReader() {
         setName(ClassUtils.getShortName(QuerydslPagingItemReader.class));
@@ -41,11 +41,6 @@ public class QuerydslPagingItemReader<T> extends AbstractPagingItemReader<T> {
         setPageSize(pageSize);
     }
 
-    protected JPAQuery<T> createQuery() {
-        JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
-        return queryFunction.apply(queryFactory);
-    }
-
     public void setEntityManagerFactory(EntityManagerFactory entityManagerFactory) {
         this.entityManagerFactory = entityManagerFactory;
     }
@@ -58,15 +53,6 @@ public class QuerydslPagingItemReader<T> extends AbstractPagingItemReader<T> {
         this.transacted = transacted;
     }
 
-    public void afterPropertiesSet() throws Exception {
-        super.afterPropertiesSet();
-        if (this.queryProvider == null) {
-            Assert.state(this.entityManagerFactory != null, "EntityManager is required when queryProvider is null");
-            Assert.state(StringUtils.hasLength(this.queryString), "Query string is required when queryProvider is null");
-        }
-
-    }
-
     public void setQueryString(String queryString) {
         this.queryString = queryString;
     }
@@ -75,8 +61,10 @@ public class QuerydslPagingItemReader<T> extends AbstractPagingItemReader<T> {
         this.queryProvider = queryProvider;
     }
 
+    @Override
     protected void doOpen() throws Exception {
         super.doOpen();
+
         this.entityManager = this.entityManagerFactory.createEntityManager(this.jpaPropertyMap);
         if (this.entityManager == null) {
             throw new DataAccessResourceFailureException("Unable to obtain an EntityManager");
@@ -88,35 +76,65 @@ public class QuerydslPagingItemReader<T> extends AbstractPagingItemReader<T> {
         }
     }
 
+    @Override
     protected void doReadPage() {
-        EntityTransaction tx = null;
-        if (this.transacted) {
-            this.entityManager.clear();
+        EntityTransaction tx = getTxOrNull();
+
+        JPAQuery<T> query = createQuery()
+                .offset(this.getPage() * this.getPageSize())
+                .limit(this.getPageSize());
+
+        initResults();
+
+        fetchQuery(query, tx);
+    }
+
+    protected EntityTransaction getTxOrNull() {
+        if (transacted) {
+            EntityTransaction tx = entityManager.getTransaction();
+            tx.begin();
+
+            entityManager.flush();
+            entityManager.clear();
+            return tx;
         }
 
-        JPAQuery<T> query = this.createQuery().offset(this.getPage() * this.getPageSize()).limit(this.getPageSize());
+        return null;
+    }
 
+    protected JPAQuery<T> createQuery() {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
+        return queryFunction.apply(queryFactory);
+    }
+
+    protected void initResults() {
         if (this.results == null) {
-            this.results = new CopyOnWriteArrayList();
+            this.results = new CopyOnWriteArrayList<>();
         } else {
             this.results.clear();
         }
-
-        if (!this.transacted) {
-            List<T> queryResult = query.fetch();
-            Iterator var7 = queryResult.iterator();
-
-            while(var7.hasNext()) {
-                T entity = (T) var7.next();
-                this.entityManager.detach(entity);
-                this.results.add(entity);
-            }
-        } else {
-            this.results.addAll(query.fetch());
-        }
-
     }
 
+    protected void fetchQuery(JPQLQuery<T> query, EntityTransaction tx) {
+        if (transacted) {
+            results.addAll(query.fetch());
+            if(tx != null) {
+                tx.commit();
+            }
+        } else {
+            List<T> queryResult = query.fetch();
+            for (T entity : queryResult) {
+                entityManager.detach(entity);
+                results.add(entity);
+            }
+        }
+    }
+
+    @Override
+    protected void jumpToItem(int itemIndex) {
+    }
+
+    @Override
     protected void doClose() throws Exception {
         this.entityManager.close();
         super.doClose();

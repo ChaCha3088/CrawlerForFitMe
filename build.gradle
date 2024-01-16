@@ -39,6 +39,9 @@ dependencies {
 	// jsoup
 	implementation 'org.jsoup:jsoup:1.16.1'
 
+	// Google API
+	implementation 'com.google.apis:google-api-services-youtube:v3-rev222-1.25.0'
+
 	// JavaYoutubeDownloader
 	implementation 'io.github.gaeqs:JavaYoutubeDownloader:1.2.3'
 
