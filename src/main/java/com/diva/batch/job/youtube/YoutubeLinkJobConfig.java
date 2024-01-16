@@ -2,7 +2,10 @@ package com.diva.batch.job.youtube;
 
 import com.diva.batch.entity.Song;
 import com.diva.batch.entity.YoutubeFile;
+import com.diva.batch.querydsl.expression.Expression;
+import com.diva.batch.querydsl.itemreader.QuerydslNoOffsetPagingItemReader;
 import com.diva.batch.querydsl.itemreader.QuerydslPagingItemReader;
+import com.diva.batch.querydsl.options.QuerydslNoOffsetNumberOptions;
 import com.diva.batch.repository.SongRepository;
 import com.diva.batch.repository.YoutubeFileRepository;
 import com.google.api.client.http.HttpRequestInitializer;
@@ -35,7 +38,7 @@ import static com.diva.batch.entity.QSong.song;
 @Configuration
 @RequiredArgsConstructor
 public class YoutubeLinkJobConfig {
-    private final EntityManagerFactory entityManagerFactory;
+    private final EntityManagerFactory emf;
     private final PlatformTransactionManager transactionManager;
     private final JobRepository jobRepository;
 
@@ -45,6 +48,8 @@ public class YoutubeLinkJobConfig {
     private final HttpTransport httpTransport;
     private final JsonFactory jsonFactory;
     private final HttpRequestInitializer httpRequestInitializer;
+    
+    private static final int CHUNK_SIZE = 10;
 
     @Value("${YOUTUBE.API_KEY}")
     private String API_KEY;
@@ -52,15 +57,15 @@ public class YoutubeLinkJobConfig {
     @Bean
     public Job youtubeLinkJob() {
         return new JobBuilder("youtubeLinkJob", jobRepository)
-                .start(youtubeLinkJob_step1())
+                .start(youtubeLinkJob_step1(null))
                 .build();
     }
 
     @Bean
     @JobScope
-    public Step youtubeLinkJob_step1() {
+    public Step youtubeLinkJob_step1(@Value("#{jobParameters[date]}") String date) {
         return new StepBuilder("youtubeLinkJob_step1", jobRepository)
-                .<Song, Song>chunk(10, transactionManager)
+                .<Song, Song>chunk(CHUNK_SIZE, transactionManager)
                 .reader(youtubeLinkJob_reader())
                 .processor(youtubeLinkJob_processor())
                 .writer(youtubeLinkJob_writer())
@@ -69,9 +74,14 @@ public class YoutubeLinkJobConfig {
 
     @Bean
     public QuerydslPagingItemReader<Song> youtubeLinkJob_reader() {
-        return new QuerydslPagingItemReader<>(entityManagerFactory, 10, queryFactory -> queryFactory
+        // 1. No Offset 옵션
+        QuerydslNoOffsetNumberOptions<Song, Long> options = new QuerydslNoOffsetNumberOptions<>(song.id, Expression.ASC);
+        
+        // 2. QueryDsl
+        return new QuerydslNoOffsetPagingItemReader<>(emf, CHUNK_SIZE, options, queryFactory -> queryFactory
                 .selectFrom(song)
-                .where(song.youtubeFile.isNull()));
+                .where(song.youtubeFile.id.isNull())
+        );
     }
 
     private ItemProcessor<Song, Song> youtubeLinkJob_processor() {
@@ -112,7 +122,7 @@ public class YoutubeLinkJobConfig {
     @Bean
     public JpaItemWriter<Song> youtubeLinkJob_writer() {
         return new JpaItemWriterBuilder<Song>()
-                .entityManagerFactory(entityManagerFactory)
+                .entityManagerFactory(emf)
                 .build();
     }
 }
