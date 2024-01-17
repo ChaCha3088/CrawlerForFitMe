@@ -25,6 +25,7 @@ configurations {
 
 repositories {
 	mavenCentral()
+	maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -42,8 +43,8 @@ dependencies {
 	// Google API
 	implementation 'com.google.apis:google-api-services-youtube:v3-rev222-1.25.0'
 
-	// JavaYoutubeDownloader
-	implementation 'io.github.gaeqs:JavaYoutubeDownloader:1.2.3'
+	// java-youtube-downloader
+	implementation 'com.github.sealedtx:java-youtube-downloader:3.2.3'
 
     // MySql
     implementation 'mysql:mysql-connector-java:8.0.33'
