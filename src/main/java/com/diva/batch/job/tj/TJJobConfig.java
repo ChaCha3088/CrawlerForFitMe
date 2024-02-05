@@ -1,10 +1,9 @@
 package com.diva.batch.job.tj;
 
 import com.diva.batch.entity.Category;
-import com.diva.batch.entity.Song;
+import com.diva.batch.entity.SongOld;
 import com.diva.batch.repository.CategoryRepository;
-import com.diva.batch.repository.SongRepository;
-import jakarta.persistence.EntityManagerFactory;
+import com.diva.batch.repository.SongOldRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Connection;
@@ -33,7 +32,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TJJobConfig {
     private final CategoryRepository categoryRepository;
-    private final SongRepository songRepository;
+    private final SongOldRepository songOldRepository;
 
     @Bean
     public Job tjJob(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
@@ -90,7 +89,7 @@ public class TJJobConfig {
                         final Document doc = response.parse();
 
                         // 파싱한 데이터를 DTO에 저장한다.
-                        List<Song> songs = new ArrayList<>();
+                        List<SongOld> songOlds = new ArrayList<>();
 
                         // div id="BoardType1"인 태그를 찾는다.
                         Element boardType1 = doc.getElementById("BoardType1");
@@ -113,7 +112,7 @@ public class TJJobConfig {
                             Element artist = trs.get(i).getElementsByTag("td").get(3);
 
                             // Song 객체 생성
-                            songs.add(Song.builder()
+                            songOlds.add(SongOld.builder()
                                     .tjId(Long.valueOf(tjId.text()))
                                     .title(title.text())
                                     .artist(artist.text())
@@ -122,7 +121,7 @@ public class TJJobConfig {
                         }
 
                         // 파싱한 데이터를 DB에 저장한다.
-                        songRepository.saveAll(songs);
+                        songOldRepository.saveAll(songOlds);
                     }
 
                     log.info(">>>>> TJ Step2 End");

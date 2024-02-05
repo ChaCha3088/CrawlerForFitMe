@@ -3,7 +3,6 @@ package com.diva.batch.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,7 +31,7 @@ public class Category {
 
     @NotNull
     @OneToMany(mappedBy = "category")
-    private List<Song> songs = new ArrayList<>();
+    private List<SongOld> songOlds = new ArrayList<>();
 
     @Builder
     protected Category(Long id, String name, String crawlingUrl) {
@@ -42,7 +41,7 @@ public class Category {
     }
 
     // == 연관관계 편의 메서드 == //
-    public void addSong(Song song) {
-        this.songs.add(song);
+    public void addSong(SongOld songOld) {
+        this.songOlds.add(songOld);
     }
 }

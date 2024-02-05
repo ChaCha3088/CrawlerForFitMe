@@ -1,72 +1,65 @@
 package com.diva.batch.entity;
 
-import com.diva.batch.enumstorage.Note;
-import jakarta.persistence.*;
+import static jakarta.persistence.GenerationType.IDENTITY;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import static jakarta.persistence.FetchType.LAZY;
-import static jakarta.persistence.GenerationType.IDENTITY;
-import static lombok.AccessLevel.PROTECTED;
-
-@Getter
 @Entity
-@NoArgsConstructor(access = PROTECTED)
-public class Song {
-    @Id @GeneratedValue(strategy = IDENTITY)
-    @Column(name = "SONG_ID")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Song extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = IDENTITY)
+    @Column(name = "song_id")
     private Long id;
 
-    @NotNull
-    @Column(unique = true, name = "TJ_ID")
-    private Long tjId;
-
     @NotBlank
+    @Column(name = "song_title", length = 50)
     private String title;
 
     @NotBlank
+    @Column(name = "artist", length = 50)
     private String artist;
 
-    private String albumUrl;
+//    @NotBlank
+    @Column(name = "cover_img", length = 200)
+    private String coverImg;
 
-    @Enumerated(EnumType.STRING)
-    private Note highestNote;
+//    @NotBlank
+    @Column(name = "lyrics", length = 10000)
+    private String lyric;
 
-    @Enumerated(EnumType.STRING)
-    private Note lowestNote;
-
+//    @NotBlank
+    @Column(name = "mr_url", length = 300)
     private String mrUrl;
 
-    @OneToOne(fetch = LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
-    @JoinColumn(name = "YOUTUBE_FILE_ID")
-    private YoutubeFile youtubeFile;
-
-    @NotNull
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "CATEGORY_ID")
-    private Category category;
+    @Setter
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "song_range_id")
+    private SongRange songRange;
 
     @Builder
-    protected Song(Long id, Long tjId, String title, String artist, Category category) {
-        this.id = id;
-        this.tjId = tjId;
+    protected Song(String title, String artist, String mrUrl, SongRange songRange) {
         this.title = title;
         this.artist = artist;
-
-        addCategory(category);
-    }
-
-    // == 연관관계 편의 메서드 == //
-    public void addCategory(Category category) {
-        this.category = category;
-
-        this.category.addSong(this);
-    }
-
-    public void addYoutubeFile(YoutubeFile youtubeFile) {
-        this.youtubeFile = youtubeFile;
+        this.mrUrl = mrUrl;
+        this.songRange = songRange;
+        if (songRange != null) {
+            songRange.setSong(this);
+        }
     }
 }

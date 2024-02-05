@@ -20,14 +20,14 @@ public class YoutubeFile {
     private String url;
 
     @OneToOne(mappedBy = "youtubeFile")
-    private Song song;
+    private SongOld songOld;
 
     @Builder
-    protected YoutubeFile(Long id, String url, Song song) {
+    protected YoutubeFile(Long id, String url, SongOld songOld) {
         this.id = id;
         this.url = url;
-        this.song = song;
+        this.songOld = songOld;
 
-        this.song.addYoutubeFile(this);
+        this.songOld.addYoutubeFile(this);
     }
 }

@@ -1,26 +1,29 @@
 package com.diva.batch.job.youtube;
 
-import com.diva.batch.entity.Song;
+import static com.diva.batch.entity.QSongOld.songOld;
+import static com.diva.batch.entity.QYoutubeFile.youtubeFile;
+
+import com.diva.batch.entity.SongOld;
 import com.diva.batch.querydsl.expression.Expression;
 import com.diva.batch.querydsl.itemreader.QuerydslNoOffsetPagingItemReader;
 import com.diva.batch.querydsl.itemreader.QuerydslPagingItemReader;
 import com.diva.batch.querydsl.options.QuerydslNoOffsetNumberOptions;
-import com.diva.batch.repository.SongRepository;
+import com.diva.batch.repository.SongOldRepository;
 import com.diva.batch.repository.YoutubeFileRepository;
 import com.github.kiulian.downloader.Config;
 import com.github.kiulian.downloader.YoutubeDownloader;
-import com.github.kiulian.downloader.downloader.proxy.ProxyCredentialsImpl;
 import com.github.kiulian.downloader.downloader.request.RequestVideoFileDownload;
 import com.github.kiulian.downloader.downloader.request.RequestVideoInfo;
 import com.github.kiulian.downloader.downloader.response.Response;
 import com.github.kiulian.downloader.model.Extension;
-import com.github.kiulian.downloader.model.Filter;
 import com.github.kiulian.downloader.model.videos.VideoDetails;
 import com.github.kiulian.downloader.model.videos.VideoInfo;
 import com.github.kiulian.downloader.model.videos.formats.AudioFormat;
 import com.github.kiulian.downloader.model.videos.formats.Format;
 import com.github.kiulian.downloader.model.videos.formats.VideoWithAudioFormat;
 import jakarta.persistence.EntityManagerFactory;
+import java.io.File;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -37,14 +40,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import java.io.File;
-import java.util.Comparator;
-import java.util.List;
-import java.util.concurrent.Executors;
-
-import static com.diva.batch.entity.QSong.song;
-import static com.diva.batch.entity.QYoutubeFile.youtubeFile;
-
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
@@ -53,9 +48,9 @@ public class YoutubeFileDownloadJobConfig {
     private final PlatformTransactionManager transactionManager;
     private final JobRepository jobRepository;
 
-    private final SongRepository songRepository;
+    private final SongOldRepository songOldRepository;
     private final YoutubeFileRepository youtubeFileRepository;
-    
+
     private static final int CHUNK_SIZE = 10;
 
     @Bean
@@ -69,7 +64,7 @@ public class YoutubeFileDownloadJobConfig {
     @JobScope
     public Step youtubeFileDownloadJob_step1(@Value("#{jobParameters[date]}") String date) {
         return new StepBuilder("youtubeFileDownloadJob_step1", jobRepository)
-                .<Song, Song>chunk(CHUNK_SIZE, transactionManager)
+                .<SongOld, SongOld>chunk(CHUNK_SIZE, transactionManager)
                 .reader(youtubeFileDownloadJob_reader())
                 .processor(youtubeFileDownloadJob_processor())
                 .writer(youtubeFileDownloadJob_writer())
@@ -77,18 +72,19 @@ public class YoutubeFileDownloadJobConfig {
     }
 
     @Bean
-    public QuerydslPagingItemReader<Song> youtubeFileDownloadJob_reader() {
+    public QuerydslPagingItemReader<SongOld> youtubeFileDownloadJob_reader() {
         // 1. No Offset 옵션
-        QuerydslNoOffsetNumberOptions<Song, Long> options = new QuerydslNoOffsetNumberOptions<>(song.id, Expression.ASC);
-        
+        QuerydslNoOffsetNumberOptions<SongOld, Long> options = new QuerydslNoOffsetNumberOptions<>(
+            songOld.id, Expression.ASC);
+
         // 2. QueryDsl
         return new QuerydslNoOffsetPagingItemReader<>(emf, CHUNK_SIZE, options, queryFactory -> queryFactory
-                .selectFrom(song)
-                .leftJoin(song.youtubeFile, youtubeFile)
+                .selectFrom(songOld)
+                .leftJoin(songOld.youtubeFile, youtubeFile)
         );
     }
 
-    private ItemProcessor<Song, Song> youtubeFileDownloadJob_processor() {
+    private ItemProcessor<SongOld, SongOld> youtubeFileDownloadJob_processor() {
         return song -> {
             log.info(">>>>> searchResult = {}", song.getArtist() + "-" + song.getTitle());
 
@@ -155,8 +151,8 @@ public class YoutubeFileDownloadJobConfig {
     }
 
     @Bean
-    public JpaItemWriter<Song> youtubeFileDownloadJob_writer() {
-        return new JpaItemWriterBuilder<Song>()
+    public JpaItemWriter<SongOld> youtubeFileDownloadJob_writer() {
+        return new JpaItemWriterBuilder<SongOld>()
                 .entityManagerFactory(emf)
                 .build();
     }
