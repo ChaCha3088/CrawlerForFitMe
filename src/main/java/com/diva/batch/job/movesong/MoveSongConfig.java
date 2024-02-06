@@ -120,7 +120,7 @@ public class MoveSongConfig {
                 .build();
             }
 
-            System.out.println(newMrUrl.length());
+            System.out.println(newMrUrl.length()git );
 
             return song;
         };
