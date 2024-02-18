@@ -24,7 +24,7 @@ public class QYoutubeFile extends EntityPathBase<YoutubeFile> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final QSong song;
+    public final QSongOld songOld;
 
     public final StringPath url = createString("url");
 
@@ -46,7 +46,7 @@ public class QYoutubeFile extends EntityPathBase<YoutubeFile> {
 
     public QYoutubeFile(Class<? extends YoutubeFile> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.song = inits.isInitialized("song") ? new QSong(forProperty("song"), inits.get("song")) : null;
+        this.songOld = inits.isInitialized("songOld") ? new QSongOld(forProperty("songOld"), inits.get("songOld")) : null;
     }
 
 }

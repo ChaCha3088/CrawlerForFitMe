@@ -1,16 +1,12 @@
 package com.diva.batch.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Getter
@@ -21,23 +17,34 @@ public class SongRange extends BaseEntity {
     @Column(name = "song_range_id")
     private Long id;
 
+    @NotBlank
     @Column(name = "highest_note", length = 10)
     private String highestNote;
 
+    @NotNull
     @Column(name = "highest_midi")
     private Integer highestMidi;
+
+    @NotNull
+    @Column(name = "genre")
+    private Long genre;
 
     @OneToOne(mappedBy = "songRange")
     private Song song;
 
+    /**
+     * @param highestNote
+     * @param highestMidi
+     * @param genre 가요는 1, 팝은 2
+     * @param song
+     */
     @Builder
-    protected SongRange(String highestNote, Integer highestMidi) {
+    protected SongRange(String highestNote, Integer highestMidi, Long genre, Song song) {
         this.highestNote = highestNote;
         this.highestMidi = highestMidi;
-    }
+        this.genre = genre;
 
-    //== 연관관계 메서드 ==//
-    public void setSong(Song song) {
         this.song = song;
+        this.song.setSongRange(this);
     }
 }

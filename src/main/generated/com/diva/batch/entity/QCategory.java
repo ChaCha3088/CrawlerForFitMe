@@ -26,7 +26,7 @@ public class QCategory extends EntityPathBase<Category> {
 
     public final StringPath name = createString("name");
 
-    public final ListPath<Song, QSong> songs = this.<Song, QSong>createList("songs", Song.class, QSong.class, PathInits.DIRECT2);
+    public final ListPath<SongOld, QSongOld> songOlds = this.<SongOld, QSongOld>createList("songOlds", SongOld.class, QSongOld.class, PathInits.DIRECT2);
 
     public QCategory(String variable) {
         super(Category.class, forVariable(variable));

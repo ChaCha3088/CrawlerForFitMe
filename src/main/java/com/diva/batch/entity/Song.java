@@ -10,7 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,6 +34,7 @@ public class Song extends BaseEntity {
     @Column(name = "artist", length = 50)
     private String artist;
 
+    @Setter
 //    @NotBlank
     @Column(name = "cover_img", length = 200)
     private String coverImg;
@@ -43,23 +43,22 @@ public class Song extends BaseEntity {
     @Column(name = "lyrics", length = 10000)
     private String lyric;
 
-//    @NotBlank
+    @NotBlank
     @Column(name = "mr_url", length = 300)
     private String mrUrl;
 
+    //    @NotNull
     @Setter
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "song_range_id")
     private SongRange songRange;
 
     @Builder
-    protected Song(String title, String artist, String mrUrl, SongRange songRange) {
+    protected Song(String title, String artist, String coverImg, String lyric, String mrUrl) {
         this.title = title;
         this.artist = artist;
+        this.coverImg = coverImg;
+        this.lyric = lyric;
         this.mrUrl = mrUrl;
-        this.songRange = songRange;
-        if (songRange != null) {
-            songRange.setSong(this);
-        }
     }
 }
