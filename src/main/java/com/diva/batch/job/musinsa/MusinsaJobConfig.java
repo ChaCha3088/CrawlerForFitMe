@@ -104,13 +104,12 @@ public class MusinsaJobConfig {
                             }
 
                             // 한 페이지에서 상품을 순회한다.
-                            for (int item = 0; item < 1; item++) { // ToDo: 나중에 90으로 변경
+                            for (int item = 0; item < 3; item++) { // ToDo: 나중에 90으로 변경
                                 // 상품 상세 페이지 접근
                                 driver.get(linkUrl.get(item));
 
                                 // 브랜드
-                                String brandName = driver.findElement(By.cssSelector("#root > div.product-detail__sc-8631sn-0 > div.product-detail__sc-8631sn-1 > div.product-detail__sc-8631sn-4 > div.product-detail__sc-achptn-0 > ul > li:nth-child(1) > div.product-detail__sc-achptn-6.TehCn > a")).getText().trim();
-
+                                String brandName = driver.findElement(By.cssSelector("#root > div > div > div > div > ul > li:nth-child(1) > div > a")).getText().trim();
                                 // 브랜드 없으면 생성
                                 // 브랜드 조회
                                 Optional<Brand> brand = brandRepository.findByName(brandName);
@@ -128,11 +127,11 @@ public class MusinsaJobConfig {
                                 }
 
                                 // 이름
-                                String productName = driver.findElement(By.cssSelector("#root > div.product-detail__sc-8631sn-0 > div.product-detail__sc-8631sn-2 > div.product-detail__sc-1klhlce-0 h3")).getText().trim();
+                                String productName = driver.findElement(By.cssSelector("#root > div > div > div> div> h3")).getText().trim();
                                 sb.append("productName: ").append(productName).append("\n");
 
                                 // 성별
-                                String gender = driver.findElement(By.cssSelector("#root > div.product-detail__sc-8631sn-0 > div.product-detail__sc-8631sn-1 > div.product-detail__sc-8631sn-4 > div.product-detail__sc-achptn-0 > ul > li:nth-child(2) > div.product-detail__sc-achptn-6.TehCn > span:last-child")).getText();
+                                String gender = driver.findElement(By.cssSelector("#root > div> div > div > div> ul > li:nth-child(2) > div > span:last-child")).getText();
                                 int g;
                                 if (gender.equals("남성")) {
                                     g = 0;
@@ -146,11 +145,11 @@ public class MusinsaJobConfig {
                                 sb.append("gender: ").append(gender).append("\n");
 
                                 // 나이대
-                                String ageRange = driver.findElement(By.cssSelector("#root > div.product-detail__sc-8631sn-0 > div.product-detail__sc-8631sn-1 > div.product-detail__sc-8631sn-4 > button > strong")).getText().replace(",", "").replace("세 이상", "").trim();
+                                String ageRange = driver.findElement(By.cssSelector("#root > div > div > div > button > strong")).getText().replace(",", "").replace("세 이상", "").trim();
                                 sb.append("ageRange: ").append(ageRange).append("\n");
 
                                 // 가격
-                                int price = Integer.parseInt(driver.findElement(By.cssSelector("#root > div.product-detail__sc-8631sn-0 > div.product-detail__sc-8631sn-1 > div.product-detail__sc-8631sn-4 > div.product-detail__sc-w5wkld-0 > div.product-detail__sc-1p1ulhg-0 > ul > li:nth-child(1) > div.product-detail__sc-1p1ulhg-6 > span")).getText().replace(",", "").replace("원", ""));
+                                int price = Integer.parseInt(driver.findElement(By.cssSelector("#root > div > div > div > div > div > ul > li:nth-child(1) > div:nth-child(2) > span")).getText().replace(",", "").replace("원", ""));
                                 sb.append("price: ").append(price).append("\n");
 
                                 // 상품 생성
@@ -166,7 +165,7 @@ public class MusinsaJobConfig {
                                 newProduct = productRepository.save(newProduct);
 
                                 // 메인 이미지
-                                List<WebElement> imageTags = driver.findElements(By.cssSelector("#root > div.product-detail__sc-8631sn-0 > div.product-detail__sc-8631sn-1 > div.product-detail__sc-8631sn-3 > div.product-detail__sc-p62agb-0 > ul > li > img"));
+                                List<WebElement> imageTags = driver.findElements(By.cssSelector("#root > div > div > div > div > ul > li > img"));
                                 for (WebElement imageTag : imageTags) {
                                     String imageUrl = imageTag.getAttribute("src");
 
@@ -183,7 +182,7 @@ public class MusinsaJobConfig {
                                 }
 
                                 // 상세 이미지 리스트
-                                List<WebElement> detailImageTags = driver.findElements(By.cssSelector("#root > div:nth-child(3) > section.product-detail__sc-5zi22l-0 > div > div.product-detail__sc-5zi22l-2 > div > div > div> img"));
+                                List<WebElement> detailImageTags = driver.findElements(By.cssSelector("#root > div:nth-child(3) > section > div > div > div > div > div> img"));
                                 for (WebElement detailImageTag : detailImageTags) {
                                     String detailImageUrl = detailImageTag.getAttribute("src");
 
@@ -196,14 +195,14 @@ public class MusinsaJobConfig {
                                 }
 
                                 // 색상 옵션 리스트
-                                List<WebElement> colorOptionTags = driver.findElements(By.cssSelector("#root > div.product-detail__sc-8631sn-0 > div.product-detail__sc-8631sn-1 > div.product-detail__sc-8631sn-4 > div.product-detail__sc-1rv3k2r-0 > div.product-detail__sc-1d13nsy-0 > select:nth-child(1) > option"));
+                                List<WebElement> colorOptionTags = driver.findElements(By.cssSelector("#root > div > div > div > div > div > select:nth-child(1) > option"));
                                 List<String> colorOptions = new ArrayList<>();
                                 for (int j = 0; j < colorOptionTags.size()-1; j++) {
                                     colorOptions.add(colorOptionTags.get(j+1).getText());
                                 }
 
                                 // 사이즈 옵션 리스트
-                                List<WebElement> sizeOptionTags = driver.findElements(By.cssSelector("#root > div.product-detail__sc-8631sn-0 > div.product-detail__sc-8631sn-1 > div.product-detail__sc-8631sn-3 > div.product-detail__sc-swak4b-0 > table > tbody > tr > th"));
+                                List<WebElement> sizeOptionTags = driver.findElements(By.cssSelector("#root > div > div > div > div > table > tbody > tr > th"));
                                 List<String> sizeOptions = new ArrayList<>();
                                 for (int j = 0; j < sizeOptionTags.size() - 1; j++) {
                                     sizeOptions.add(sizeOptionTags.get(j + 1).getText().replace("(품절)", "").replaceAll("\\(마지막 \\d+개\\)$", "").trim());
@@ -226,7 +225,7 @@ public class MusinsaJobConfig {
                                 }
 
                                 // 태그
-                                List<WebElement> tags = driver.findElements(By.cssSelector("#root > div.product-detail__sc-8631sn-0 > div.product-detail__sc-8631sn-1 > div.product-detail__sc-8631sn-4 > div.product-detail__sc-achptn-0.bHXxTQ > div > a"));
+                                List<WebElement> tags = driver.findElements(By.cssSelector("#root > div > div > div > div > div > a"));
                                 sb.append("tag: ");
                                 for (WebElement webElement : tags) {
                                     String tag = webElement.getText().replace("#", "").trim();
@@ -255,7 +254,7 @@ public class MusinsaJobConfig {
                                         .tag(realTag)
                                         .build();
                                 }
-
+                                System.out.println(brandName);
                                 // 상품 저장
                                 productRepository.save(newProduct);
                                 sb.append("\n");
