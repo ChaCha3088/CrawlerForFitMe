@@ -30,7 +30,6 @@ public class MainImage extends BaseEntity {
     private MainImage(String url, Product product) {
         this.url = url;
         this.product = product;
-
         this.product.addMainImage(this);
     }
 }

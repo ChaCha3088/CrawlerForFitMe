@@ -8,6 +8,6 @@ spring:
 aws:
     paramstore:
         enabled: true
-        prefix: /Diva
+        prefix: /FitMe
         name: BATCH
         profileSeparator: _

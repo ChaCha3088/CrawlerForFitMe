@@ -44,7 +44,7 @@ public class Product extends BaseEntity {
     private List<ProductReview> productReviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "product")
-    private List<ProductTag> productTags;
+    private List<ProductTag> productTags = new ArrayList<>();
 
     private String name;
 
@@ -58,27 +58,27 @@ public class Product extends BaseEntity {
     private int likeCount = 0;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<ProductOption> productOptions;
+    private List<ProductOption> productOptions = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<MainImage> mainImage;
+    private List<MainImage> mainImage = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<DetailImage> detailImage;
+    private List<DetailImage> detailImage = new ArrayList<>();
 
     @Builder
-    public Product(Brand brand, Category category, String name, Gender gender, String ageRange,
-                   List<ProductTag> productTags, Integer price, List<ProductOption> productOptions, List<MainImage> mainImages, List<DetailImage> detailImages) {
+    private Product(Brand brand, Category category, String name, Gender gender, String ageRange,
+                   Integer price) {
         this.brand = brand;
         this.category = category;
         this.name = name;
         this.gender = gender;
         this.ageRange = ageRange;
         this.price = price;
-        this.productOptions = productOptions;
-        this.mainImage = mainImages;
-        this.detailImage = detailImages;
-        this.productTags = productTags;
+        this.productOptions = new ArrayList<>();
+        this.mainImage = new ArrayList<>();
+        this.detailImage = new ArrayList<>();
+        this.productTags = new ArrayList<>();
     }
 
 
@@ -102,6 +102,14 @@ public class Product extends BaseEntity {
     }
 
     // == 연관관계 메소드 == //
+    public void addProductTag(ProductTag productTag) {
+        this.productTags.add(productTag);
+    }
+
+    public void addProductOption(ProductOption productOption) {
+        this.productOptions.add(productOption);
+    }
+
     public void addMainImage(MainImage mainImage) {
         this.mainImage.add(mainImage);
     }

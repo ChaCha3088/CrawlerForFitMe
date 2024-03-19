@@ -35,6 +35,8 @@ public class ProductOption {
     @Builder
     public ProductOption(Product product, String color, String size, int stockQuantity) {
         this.product = product;
+        this.product.addProductOption(this);
+
         this.color = color;
         this.size = size;
         this.stockQuantity = stockQuantity;

@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -29,8 +30,11 @@ public class ProductTag {
     @ManyToOne(fetch = FetchType.LAZY)
     private Tag tag;
 
-    public ProductTag(Product product, Tag tag) {
+    @Builder
+    private ProductTag(Product product, Tag tag) {
         this.product = product;
+        this.product.addProductTag(this);
+
         this.tag = tag;
     }
 }
