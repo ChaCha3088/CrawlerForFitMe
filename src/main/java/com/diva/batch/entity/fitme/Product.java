@@ -58,7 +58,7 @@ public class Product extends BaseEntity {
     private int likeCount = 0;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<ProductOption> productOptions = new ArrayList<>();
+    private List<ProductColor> productColor = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<MainImage> mainImage = new ArrayList<>();
@@ -75,7 +75,7 @@ public class Product extends BaseEntity {
         this.gender = gender;
         this.ageRange = ageRange;
         this.price = price;
-        this.productOptions = new ArrayList<>();
+        this.productColor = new ArrayList<>();
         this.mainImage = new ArrayList<>();
         this.detailImage = new ArrayList<>();
         this.productTags = new ArrayList<>();
@@ -106,8 +106,8 @@ public class Product extends BaseEntity {
         this.productTags.add(productTag);
     }
 
-    public void addProductOption(ProductOption productOption) {
-        this.productOptions.add(productOption);
+    public void addProductColor(ProductColor productColor) {
+        this.productColor.add(productColor);
     }
 
     public void addMainImage(MainImage mainImage) {

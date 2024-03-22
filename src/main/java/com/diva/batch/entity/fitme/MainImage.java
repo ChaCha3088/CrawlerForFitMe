@@ -20,7 +20,6 @@ public class MainImage extends BaseEntity {
     @Id @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @NotBlank
     private String url;
 
     @ManyToOne(fetch = LAZY)
