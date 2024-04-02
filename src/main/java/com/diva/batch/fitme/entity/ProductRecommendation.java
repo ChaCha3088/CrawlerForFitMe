@@ -1,4 +1,4 @@
-package com.diva.batch.entity.fitme;
+package com.diva.batch.fitme.entity;
 
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -7,8 +7,8 @@ import static lombok.AccessLevel.PROTECTED;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,19 +16,23 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = PROTECTED)
-public class DetailImage extends BaseEntity {
+public class ProductRecommendation {
     @Id @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    private String url;
-
+    @JoinColumn(name = "product_id")
     @ManyToOne(fetch = LAZY)
     private Product product;
 
+    @JoinColumn(name = "recommendation_id")
+    @ManyToOne(fetch = LAZY)
+    private Product recommendation;
+
     @Builder
-    private DetailImage(String url, Product product) {
-        this.url = url;
+    private ProductRecommendation(Product product, Product recommendation) {
         this.product = product;
-        this.product.addDetailImage(this);
+        this.product.addRecommendation(this);
+
+        this.recommendation = recommendation;
     }
 }

@@ -5,13 +5,13 @@ spring:
         activate:
             on-profile: local
     datasource:
-        url: jdbc:mysql://localhost:3306/fitme?useSSL=false&serverTimezone=Asia/Seoul
-        username: ssafy
-        password: ssafyssafy
+        url: jdbc:mysql://${MY_SQL.HOST}:${MY_SQL.PORT}/${MY_SQL.DATABASE}?useSSL=false&serverTimezone=Asia/Seoul
+        username: ${DB.USERNAME}
+        password: ${DB.PASSWORD}
         driver-class-name: com.mysql.cj.jdbc.Driver
     jpa:
         hibernate:
-            ddl-auto: update
+            ddl-auto: none
             logging:
                 level:
                     org:

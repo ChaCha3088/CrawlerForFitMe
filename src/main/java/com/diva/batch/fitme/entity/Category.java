@@ -1,7 +1,6 @@
-package com.diva.batch.entity.fitme;
+package com.diva.batch.fitme.entity;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
-import static lombok.AccessLevel.PROTECTED;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,17 +13,17 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@NoArgsConstructor(access = PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Category {
 
     @Id
+    @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
     private String name;
 
     @Builder
-    public Category(Long id, String name) {
-        this.id = id;
+    private Category(String name) {
         this.name = name;
     }
 }

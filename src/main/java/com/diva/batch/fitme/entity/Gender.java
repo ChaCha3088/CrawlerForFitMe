@@ -1,5 +1,6 @@
-package com.diva.batch.entity.fitme;
+package com.diva.batch.fitme.entity;
 
+import com.diva.batch.fitme.exception.GenderBadRequestException;
 import lombok.Getter;
 
 @Getter
@@ -18,6 +19,6 @@ public enum Gender {
                 return gender;
             }
         }
-        throw new RuntimeException();
+        throw new GenderBadRequestException();
     }
 }
